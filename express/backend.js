@@ -9,6 +9,8 @@ app.use(cors({
   credentials: true,
   origin: 'http://localhost:5173'
 }))
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
 app.use(session({
   secret: 'mi-secreto',
   resave: false,
@@ -30,8 +32,9 @@ app.get('/', (req, res) => {
   res.send('Hello World!');
 });
 
-app.get('/login', async (req, res) => {
-  const datos = req.query;
+app.post('/login', async (req, res) => {
+  const datos = req.body;
+  console.log('POST /login payload:', datos);
 
   try {
     const [results] = await connection.query(
@@ -39,7 +42,6 @@ app.get('/login', async (req, res) => {
       [datos.usuario, datos.clave]
     );
 
-    
     if (results.length > 0) {
       req.session.usuario = datos.usuario; // Guardar el usuario en la sesión
       return res.status(200).send({ ok: true, message: 'Inicio de sesión correcto' });
